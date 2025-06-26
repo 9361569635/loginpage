@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Page</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f0f4f8;
+    }
+    .login-container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 300px;
+    }
+    input[type="text"], input[type="password"] {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 12px;
+      background: #007bff;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #userInfo {
+      margin-top: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Login</h2>
+
+    <!-- Manual Login -->
+    <input type="text" id="username" placeholder="Username" required /><br />
+    <input type="password" id="password" placeholder="Password" required /><br />
+    <button onclick="manualLogin()">Login</button>
+
+    <p style="margin: 15px 0; font-weight: bold;">OR</p>
+
+    <!-- Google Sign-In -->
+    <div id="g_id_onload"
+         data-client_id="YOUR_CLIENT_ID_HERE"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+         data-type="standard"
+         data-size="large"
+         data-theme="outline"
+         data-text="continue_with"
+         data-shape="rectangular">
+    </div>
+  </div>
+
+  <div id="userInfo">
+    <h3>Welcome, <span id="userName"></span>!</h3>
+    <p>Email: <span id="userEmail"></span></p>
+  </div>
+
+  <script>
+    // Manual Login - Basic check (demo only)
+    function manualLogin() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      if (username === "admin" && password === "1234") {
+        document.getElementById("userInfo").style.display = "block";
+        document.getElementById("userName").innerText = username;
+        document.getElementById("userEmail").innerText = "Manual Login";
+      } else {
+        alert("Invalid username or password");
+      }
+    }
+
+    // Google Sign-In
+    function handleCredentialResponse(response) {
+      const data = decodeJwtResponse(response.credential);
+      document.getElementById("userInfo").style.display = "block";
+      document.getElementById("userName").innerText = data.name;
+      document.getElementById("userEmail").innerText = data.email;
+    }
+
+    // Decode JWT (Google token)
+    function decodeJwtResponse(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      ).join(''));
+      return JSON.parse(jsonPayload);
+    }
+  </script>
+
+</body>
+</html>
